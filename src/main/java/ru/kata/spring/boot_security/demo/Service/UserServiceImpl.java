@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public void removeUserById(long id) {
-        userRepository.delete(userRepository.getById(id));
+        userRepository.delete(userRepository.findById(id).get());
     }
 
     @Override
@@ -49,12 +49,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public User getUser(long id) {
-        return userRepository.getById(id);
+        return userRepository.findById(id).get();//должно быть именно findById(id).get(), иначе не работает REST
     }
 
     @Override
     public void updateUser(long id, User user) {
-        User oldUserData = userRepository.getById(id);
+        User oldUserData = userRepository.findById(id).get();
         oldUserData.setUsername(user.getUsername());
         oldUserData.setSurname(user.getSurname());
         oldUserData.setAge(user.getAge());

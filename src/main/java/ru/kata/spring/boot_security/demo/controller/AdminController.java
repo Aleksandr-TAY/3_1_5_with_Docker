@@ -2,7 +2,6 @@ package ru.kata.spring.boot_security.demo.controller;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -10,13 +9,13 @@ import ru.kata.spring.boot_security.demo.Service.UserService;
 import ru.kata.spring.boot_security.demo.models.User;
 
 import javax.validation.Valid;
-import java.security.Principal;
 import java.util.List;
 
 
-@Controller
+@RestController
 @RequestMapping("/admin")
 public class AdminController {
+
     private final UserService userService;
 
     @Autowired
@@ -26,15 +25,20 @@ public class AdminController {
 
     //Показать всех пользователей
     @GetMapping
-    public String showAllUsers(@ModelAttribute("user") User user, ModelMap model, Principal principal) {
-        model.addAttribute("users", userService.getAllUsers());
-        User authUser = userService.findByUsername(principal.getName());
-        model.addAttribute("user", authUser);
-        List<User> allUsersList = userService.getAllUsers();
-        model.addAttribute("allUsersList", allUsersList);
-        return "users";
+    public List<User> showAllUsers() {
+        List<User> allUsers = userService.getAllUsers();
+        return allUsers;
     }
-   //создаем пользователя
+//    @GetMapping
+//    public String showAllUsers(@ModelAttribute("user") User user, ModelMap model, Principal principal) {
+//        model.addAttribute("users", userService.getAllUsers());
+//        User authUser = userService.findByUsername(principal.getName());
+//        model.addAttribute("user", authUser);
+//        List<User> allUsersList = userService.getAllUsers();
+//        model.addAttribute("allUsersList", allUsersList);
+//        return "users";
+//    }
+    //создаем пользователя
 //    @GetMapping("/new")
 //    public String newUser(@ModelAttribute("user") User user) {
 //        return "new";
@@ -68,10 +72,15 @@ public class AdminController {
         userService.removeUserById(id);
         return "redirect:/admin";
     }
+
     //Показать одного пользователя
+//    @GetMapping("/{id}")
+//    public String showOneUser(@PathVariable("id") long id1, ModelMap model) {
+//        model.addAttribute("user", userService.getUser(id1));
+//        return "user";
+//    }
     @GetMapping("/{id}")
-    public String showOneUser(@PathVariable("id") long id1, ModelMap model) {
-        model.addAttribute("user", userService.getUser(id1));
-        return "user";
+    public User showOneUser(@PathVariable("id") long id) {
+        return userService.getUser(id);
     }
 }
