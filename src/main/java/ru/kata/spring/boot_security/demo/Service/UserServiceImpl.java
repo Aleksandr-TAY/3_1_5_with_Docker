@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.kata.spring.boot_security.demo.Util.UserNotFoundException;
 import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.repository.UserRepository;
@@ -37,7 +38,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public void removeUserById(long id) {
-        userRepository.delete(userRepository.findById(id).get());
+        userRepository.delete(userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("There is no user with ID = " + id + " in Database")));
     }
 
     @Override
@@ -49,12 +50,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public User getUser(long id) {
-        return userRepository.findById(id).get();//должно быть именно findById(id).get(), иначе не работает REST
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("There is no user with ID = " + id + " in Database"));
+        //должно быть именно findById(id), иначе не работает REST
     }
 
     @Override
-    public void updateUser(long id, User user) {
-        User oldUserData = userRepository.findById(id).get();
+    public void updateUser(User user) {
+        User oldUserData = userRepository.findById(user.getId()).orElseThrow(() -> new UserNotFoundException("There is no user with ID = " + user.getId() + " in Database"));
         oldUserData.setUsername(user.getUsername());
         oldUserData.setSurname(user.getSurname());
         oldUserData.setAge(user.getAge());
@@ -69,7 +71,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = findByUsername(username);
+        User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException(String.format("User '%s' not found", username));
         }

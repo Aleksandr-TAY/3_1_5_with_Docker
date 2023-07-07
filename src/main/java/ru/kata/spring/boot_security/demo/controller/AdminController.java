@@ -2,10 +2,14 @@ package ru.kata.spring.boot_security.demo.controller;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.Service.UserService;
+import ru.kata.spring.boot_security.demo.Util.UserErrorResponse;
+import ru.kata.spring.boot_security.demo.Util.UserNotFoundException;
 import ru.kata.spring.boot_security.demo.models.User;
 
 import javax.validation.Valid;
@@ -44,33 +48,52 @@ public class AdminController {
 //        return "new";
 //    }
 
+//создаем пользователя REST
     @PostMapping("/")
-    public String create(@ModelAttribute("user") User user) {
+    public User addNewUser(@RequestBody User user) {
         userService.addUser(user);
-        return "redirect:/admin";
+        return user;
     }
-
+//    @PostMapping("/")
+//    public String create(@ModelAttribute("user") User user) {
+//        userService.addUser(user);
+//        return "redirect:/admin";
+//    }
     //обновляем пользователя
-    @GetMapping("/{id}/edit")
-    public String edit(ModelMap model, @PathVariable("id") long id) {
-        model.addAttribute("user", userService.getUser(id));
-        return "edit";
+//    @GetMapping("/{id}/edit")
+//    public String edit(ModelMap model, @PathVariable("id") long id) {
+//        model.addAttribute("user", userService.getUser(id));
+//        return "edit";
+//    }
+
+    //обновляем пользователя REST
+    @PutMapping
+    public User updateUser(@RequestBody User user) {
+        userService.updateUser(user);
+        return user;
     }
 
-    @PatchMapping("/{id}")
-    public String update(@Valid @ModelAttribute("user") User user, BindingResult bindingResult, @PathVariable("id") long id) {
-        if (bindingResult.hasErrors())
-            return "/edit";
+//    @PatchMapping("/{id}")
+//    public String update(@Valid @ModelAttribute("user") User user, BindingResult bindingResult, @PathVariable("id") long id) {
+//        if (bindingResult.hasErrors())
+//            return "/edit";
+//
+//        userService.updateUser(id, user);
+//        return "redirect:/admin";
+//    }
 
-        userService.updateUser(id, user);
-        return "redirect:/admin";
-    }
+//    //Удаляем пользователя
+//    @DeleteMapping("/{id}")
+//    public String delete(@PathVariable("id") long id) {
+//        userService.removeUserById(id);
+//        return "redirect:/admin";
+//    }
 
-    //Удаляем пользователяч
+    //Удаляем пользователя
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") long id) {
+    public String deleteUser(@PathVariable("id") long id) {
         userService.removeUserById(id);
-        return "redirect:/admin";
+        return "User with ID = " + id + " was  deleted";
     }
 
     //Показать одного пользователя
@@ -79,6 +102,8 @@ public class AdminController {
 //        model.addAttribute("user", userService.getUser(id1));
 //        return "user";
 //    }
+
+    //Показать одного пользователя REST
     @GetMapping("/{id}")
     public User showOneUser(@PathVariable("id") long id) {
         return userService.getUser(id);

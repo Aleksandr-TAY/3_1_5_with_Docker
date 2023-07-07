@@ -26,8 +26,10 @@ public class User implements UserDetails {
     @Transient
     private String passwordConfirm;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable
+    @ManyToMany()
+    @JoinTable(name = "users_roles",
+            joinColumns = @JoinColumn(name = "username"),
+            inverseJoinColumns = @JoinColumn(name = "role"))
     private Set<Role> roles;
 
     public User() {
