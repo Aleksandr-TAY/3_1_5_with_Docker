@@ -1,145 +1,57 @@
 package ru.kata.spring.boot_security.demo.models;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Data
+@NoArgsConstructor
 @Table(name = "users")
-public class User implements UserDetails {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @Column(name = "id_user")
+    private int id;
 
-    private String username;
-
-    private String surname;
-
-    private int age;
+    @Column(name = "first_name")
+    private String firstname;
+    @Column(name = "last_name")
+    private String lastname;
 
     private String password;
 
-    @Transient
-    private String passwordConfirm;
+    private Byte age;
 
-    @ManyToMany()
-    @JoinTable(name = "users_roles",
-            joinColumns = @JoinColumn(name = "username"),
-            inverseJoinColumns = @JoinColumn(name = "role"))
+    private String email;
+
+    @ManyToMany
+    @JoinTable(
+            name = "role_user",
+            joinColumns = @JoinColumn(name = "id_user"),
+            inverseJoinColumns = @JoinColumn(name = "id_role")
+    )
     private Set<Role> roles;
 
-    public User() {
-    }
-
-    public User(String username, String surname, int age, String password, Set<Role> roles) {
-        this.username = username;
-        this.surname = surname;
-        this.age = age;
-        this.password = password;
+    public User(Set<Role> roles) {
         this.roles = roles;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
-
-    public void setPassword(String password) {
+    public User(String firstName, String lastName, String password, Byte age, String email) {
+        this.firstname = firstName;
+        this.lastname = lastName;
         this.password = password;
+        this.age = age;
+        this.email = email;
     }
 
-    public String getPasswordConfirm() {
-        return passwordConfirm;
-    }
-
-    public void setPasswordConfirm(String passwordConfirm) {
-        this.passwordConfirm = passwordConfirm;
-    }
-
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
-//
-    public String getRolesString() {
-        return getRoles().toString().replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("ROLE_", "");
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", surname='" + surname + '\'' +
-                ", age=" + age +
-                ", password='" + password + '\'' +
-                ", passwordConfirm='" + passwordConfirm + '\'' +
-                ", roles=" + roles +
-                '}';
+    public void addRole(Role role) {
+        if (roles == null)
+            roles = new HashSet<>();
+        roles.add(role);
     }
 }

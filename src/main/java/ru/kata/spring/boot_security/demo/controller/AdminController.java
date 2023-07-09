@@ -1,23 +1,17 @@
 package ru.kata.spring.boot_security.demo.controller;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.kata.spring.boot_security.demo.Service.UserService;
-import ru.kata.spring.boot_security.demo.Util.UserErrorResponse;
-import ru.kata.spring.boot_security.demo.Util.UserNotFoundException;
 import ru.kata.spring.boot_security.demo.models.User;
+import ru.kata.spring.boot_security.demo.Service.UserService;
 
-import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 
-
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/api")
 public class AdminController {
 
     private final UserService userService;
@@ -27,85 +21,39 @@ public class AdminController {
         this.userService = userService;
     }
 
-    //Показать всех пользователей
-    @GetMapping
-    public List<User> showAllUsers() {
-        List<User> allUsers = userService.getAllUsers();
-        return allUsers;
-    }
-//    @GetMapping
-//    public String showAllUsers(@ModelAttribute("user") User user, ModelMap model, Principal principal) {
-//        model.addAttribute("users", userService.getAllUsers());
-//        User authUser = userService.findByUsername(principal.getName());
-//        model.addAttribute("user", authUser);
-//        List<User> allUsersList = userService.getAllUsers();
-//        model.addAttribute("allUsersList", allUsersList);
-//        return "users";
-//    }
-    //создаем пользователя
-//    @GetMapping("/new")
-//    public String newUser(@ModelAttribute("user") User user) {
-//        return "new";
-//    }
-
-//создаем пользователя REST
-    @PostMapping("/")
-    public User addNewUser(@RequestBody User user) {
-        userService.addUser(user);
-        return user;
-    }
-//    @PostMapping("/")
-//    public String create(@ModelAttribute("user") User user) {
-//        userService.addUser(user);
-//        return "redirect:/admin";
-//    }
-    //обновляем пользователя
-//    @GetMapping("/{id}/edit")
-//    public String edit(ModelMap model, @PathVariable("id") long id) {
-//        model.addAttribute("user", userService.getUser(id));
-//        return "edit";
-//    }
-
-    //обновляем пользователя REST
-    @PutMapping
-    public User updateUser(@RequestBody User user) {
-        userService.updateUser(user);
-        return user;
+    @PutMapping("/edit")
+    public ResponseEntity<HttpStatus> update(@RequestBody User user ) {
+        userService.add(user);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
-//    @PatchMapping("/{id}")
-//    public String update(@Valid @ModelAttribute("user") User user, BindingResult bindingResult, @PathVariable("id") long id) {
-//        if (bindingResult.hasErrors())
-//            return "/edit";
-//
-//        userService.updateUser(id, user);
-//        return "redirect:/admin";
-//    }
-
-//    //Удаляем пользователя
-//    @DeleteMapping("/{id}")
-//    public String delete(@PathVariable("id") long id) {
-//        userService.removeUserById(id);
-//        return "redirect:/admin";
-//    }
-
-    //Удаляем пользователя
-    @DeleteMapping("/{id}")
-    public String deleteUser(@PathVariable("id") long id) {
-        userService.removeUserById(id);
-        return "User with ID = " + id + " was  deleted";
+    @PostMapping("/newUser")
+    public ResponseEntity<HttpStatus> create(@RequestBody User user) {
+        userService.add(user);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    //Показать одного пользователя
-//    @GetMapping("/{id}")
-//    public String showOneUser(@PathVariable("id") long id1, ModelMap model) {
-//        model.addAttribute("user", userService.getUser(id1));
-//        return "user";
-//    }
+    @DeleteMapping("/{id}/delete")
+    public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
+        userService.removeUser(id);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
 
-    //Показать одного пользователя REST
-    @GetMapping("/{id}")
-    public User showOneUser(@PathVariable("id") long id) {
-        return userService.getUser(id);
+    @GetMapping("users/{id}")
+    public ResponseEntity<User> getUserId (@PathVariable("id") int id) {
+        User user = userService.getUser(id);
+        return new ResponseEntity<>(user,HttpStatus.OK);
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<User> userPage(Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @GetMapping("/allUsers")
+    private ResponseEntity<List<User>> getUsers() {
+        return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 }
+
