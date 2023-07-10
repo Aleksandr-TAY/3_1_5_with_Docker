@@ -72,7 +72,7 @@ async function createUser() {
             body: JSON.stringify(user)
         }).then(res => {
             if (res.ok) {
-                alert('response.json()');
+                // alert('response.json()');
                 getAdminPanel();
                 $('.nav-tabs button[data-bs-target="#tableForm"]');
             }
@@ -203,7 +203,7 @@ async function editUser(modal, id) {
                                value="${user.email}"/>
                     </div>
                     <div class="m-3">
-                        <label for="passwordEdit" class="col-form-label">Email</label>
+                        <label for="passwordEdit" class="col-form-label">Password</label>
                         <input type="text" class="form-control" id="passwordEdit" name="password"
                                required/>
                     </div>
